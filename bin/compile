@@ -1,0 +1,31 @@
+#!/bin/bash
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+ENV_DIR=$3
+
+echo "Installing Google Cloud SDK..."
+
+# Set up temporary path
+export DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies
+apt-get update -y
+apt-get install -y apt-transport-https ca-certificates gnupg curl lsb-release gnupg-agent software-properties-common
+
+# Add the Cloud SDK distribution URI as a package source
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | \
+    tee /etc/apt/sources.list.d/google-cloud-sdk.list
+
+# Import the Google Cloud public key
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | \
+    gpg --dearmor > /usr/share/keyrings/cloud.google.gpg
+
+# Install the SDK
+apt-get update -y && apt-get install -y google-cloud-sdk
+
+# Ensure it's available at runtime
+mkdir -p "$BUILD_DIR/.profile.d"
+echo 'export PATH=$PATH:/usr/bin:/google-cloud-sdk/bin' >> "$BUILD_DIR/.profile.d/google-cloud-sdk.sh"
+
+echo "Google Cloud SDK installed successfully."
