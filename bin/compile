@@ -16,6 +16,6 @@ echo "Installing components..."
 
 echo "Exporting path..."
 mkdir -p "$BUILD_DIR/.profile.d"
-echo "export PATH=\$PATH:$GCLOUD_SDK_DIR/bin" >> "$BUILD_DIR/.profile.d/google-cloud-sdk.sh"
+echo "export PATH=\$PATH:/app/google-cloud-sdk/bin" >> "$BUILD_DIR/.profile.d/google-cloud-sdk.sh"
 
 echo "Google Cloud SDK installed to $GCLOUD_SDK_DIR"
