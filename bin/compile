@@ -1,31 +1,21 @@
 #!/bin/bash
 
 BUILD_DIR=$1
-CACHE_DIR=$2
-ENV_DIR=$3
+GCLOUD_VERSION=514.0.0
+GCLOUD_SDK_DIR="$BUILD_DIR/google-cloud-sdk"
 
-echo "Installing Google Cloud SDK..."
+echo "Downloading Google Cloud SDK $GCLOUD_VERSION..."
+curl -o gcloud.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_VERSION}-linux-x86_64.tar.gz
 
-# Set up temporary path
-export DEBIAN_FRONTEND=noninteractive
+echo "Extracting..."
+mkdir -p "$GCLOUD_SDK_DIR"
+tar -xzf gcloud.tar.gz -C "$BUILD_DIR"
 
-# Install dependencies
-apt-get update -y
-apt-get install -y apt-transport-https ca-certificates gnupg curl lsb-release gnupg-agent software-properties-common
+echo "Installing components..."
+"$GCLOUD_SDK_DIR/install.sh" --quiet
 
-# Add the Cloud SDK distribution URI as a package source
-echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | \
-    tee /etc/apt/sources.list.d/google-cloud-sdk.list
-
-# Import the Google Cloud public key
-curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | \
-    gpg --dearmor > /usr/share/keyrings/cloud.google.gpg
-
-# Install the SDK
-apt-get update -y && apt-get install -y google-cloud-sdk
-
-# Ensure it's available at runtime
+echo "Exporting path..."
 mkdir -p "$BUILD_DIR/.profile.d"
-echo 'export PATH=$PATH:/usr/bin:/google-cloud-sdk/bin' >> "$BUILD_DIR/.profile.d/google-cloud-sdk.sh"
+echo "export PATH=\$PATH:$GCLOUD_SDK_DIR/bin" >> "$BUILD_DIR/.profile.d/google-cloud-sdk.sh"
 
-echo "Google Cloud SDK installed successfully."
+echo "Google Cloud SDK installed to $GCLOUD_SDK_DIR"
